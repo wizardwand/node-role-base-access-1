@@ -8,6 +8,7 @@ router.post('/authenticate', authenticate);
 router.get('/', authorize(Role.Manager), getAll); 
 router.get('/:id', authorize(), getById);      
 router.post('/', authorize(), getById);         
+router.delete('/', authorize(), deleteUser);         
 router.post('/create', authorize(), createUser);         
 module.exports = router;
 
@@ -37,15 +38,26 @@ function getById(req, res, next) {
 }
 
 function createUser(req, res, next) {
-    console.log("------------------");
-    console.log(req.body);
+    // console.log("------------------");
+    // console.log(req.body);
     const currentUser = req.user;
-    console.log("currentUser: " + JSON.stringify(currentUser));
+    // console.log("currentUser: " + JSON.stringify(currentUser));
     if (!isGlobalManager(currentUser)) {
         return res.status(401).json({ message: 'Unauthorized' });
     }
 
     userService.create(req.body)
+        .then(() => res.json({}))
+        .catch(err => next(err));
+}
+
+function deleteUser(req, res, next) {
+    const currentUser = req.user;
+    if (!isGlobalManager(currentUser)) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    userService.deleteUser(req.body)
         .then(() => res.json({}))
         .catch(err => next(err));
 }

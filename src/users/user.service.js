@@ -23,7 +23,8 @@ module.exports = {
     authenticate,
     getAll,
     getById,
-    create
+    create,
+    deleteUser
 };
 
 async function authenticate({ username, password }) {
@@ -73,6 +74,18 @@ async function create(userParam) {
     };
 
     users.push(user);
+    return user;
+}
+
+async function deleteUser(userParam) {
+    // validate
+    if (await !userExists(userParam.username)) {
+        throw 'Username "' + userParam.username + '" is Not present';
+    }
+
+    const user = users.find(u => u.username === userParam.username);
+    // delete user
+    users.splice(users.indexOf(user), 1);
     return user;
 }
 
